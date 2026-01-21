@@ -1,12 +1,20 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useRole } from '@/contexts/RoleContext';
+import { RoleToggle } from '@/components/RoleToggle';
+import { TeacherDashboard } from '@/components/teacher/TeacherDashboard';
+import { StudentPractice } from '@/components/student/StudentPractice';
 
 const Index = () => {
+  const { role } = useRole();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="relative min-h-screen">
+      {/* Role Toggle - Fixed Position */}
+      <div className="fixed top-4 right-4 z-50">
+        <RoleToggle />
       </div>
+
+      {/* Content based on role */}
+      {role === 'teacher' ? <TeacherDashboard /> : <StudentPractice />}
     </div>
   );
 };
