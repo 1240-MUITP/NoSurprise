@@ -1,20 +1,27 @@
+import { useState } from 'react';
 import { useRole } from '@/contexts/RoleContext';
-import { RoleToggle } from '@/components/RoleToggle';
 import { TeacherDashboard } from '@/components/teacher/TeacherDashboard';
 import { StudentPractice } from '@/components/student/StudentPractice';
 
 const Index = () => {
   const { role } = useRole();
+  const [showSettings, setShowSettings] = useState(false);
+
+  const handleSettingsToggle = () => setShowSettings(!showSettings);
 
   return (
     <div className="relative min-h-screen">
-      {/* Role Toggle - Fixed Position */}
-      <div className="fixed top-4 right-4 z-50">
-        <RoleToggle />
-      </div>
-
-      {/* Content based on role */}
-      {role === 'teacher' ? <TeacherDashboard /> : <StudentPractice />}
+      {role === 'teacher' ? (
+        <TeacherDashboard 
+          showSettings={showSettings} 
+          onBack={handleSettingsToggle} 
+        />
+      ) : (
+        <StudentPractice 
+          showSettings={showSettings} 
+          onBack={handleSettingsToggle} 
+        />
+      )}
     </div>
   );
 };
