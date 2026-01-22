@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BookOpen, Clock, Eye, EyeOff, CheckCircle2, AlertCircle, ChevronRight, Timer, Filter, X, Settings, ChevronDown } from 'lucide-react';
+import { BookOpen, Clock, Eye, EyeOff, CheckCircle2, AlertCircle, ChevronRight, Timer, Filter, X, Settings, ChevronDown, Link as LinkIcon, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -497,6 +497,71 @@ export const StudentPractice = ({ showSettings = false, onBack }: StudentPractic
               </div>
               <p className="text-xs text-muted-foreground mt-2">
                 Your study data is private and only visible to you.
+              </p>
+            </div>
+
+            {/* Link History */}
+            <div>
+              <h3 className="font-medium mb-3 flex items-center gap-2">
+                <LinkIcon className="w-4 h-4" />
+                Practice Links History
+              </h3>
+              <div className="space-y-2">
+                {[
+                  { 
+                    id: '1', 
+                    title: 'Physics Mid-Term Practice', 
+                    link: 'https://practice.nosurprise.app/phy-mid-2024',
+                    lastVisited: '2024-01-20'
+                  },
+                  { 
+                    id: '2', 
+                    title: 'Chemistry Final Prep', 
+                    link: 'https://practice.nosurprise.app/chem-final-2024',
+                    lastVisited: '2024-01-18'
+                  },
+                  { 
+                    id: '3', 
+                    title: 'Mathematics Practice Set', 
+                    link: 'https://practice.nosurprise.app/math-practice-a',
+                    lastVisited: '2024-01-15'
+                  },
+                  { 
+                    id: '4', 
+                    title: 'Biology Chapter Tests', 
+                    link: 'https://practice.nosurprise.app/bio-chapters',
+                    lastVisited: '2024-01-10'
+                  },
+                ].map((item) => (
+                  <div 
+                    key={item.id} 
+                    className="flex items-center justify-between p-3 bg-muted/50 rounded-xl hover:bg-muted transition-colors group"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{item.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{item.link}</p>
+                    </div>
+                    <div className="flex items-center gap-2 ml-3">
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(item.lastVisited).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })}
+                      </span>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => window.open(item.link, '_blank')}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                Quick access to all practice sites you've visited.
               </p>
             </div>
 
