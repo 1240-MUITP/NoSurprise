@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BookOpen, Clock, Eye, EyeOff, CheckCircle2, AlertCircle, ChevronRight, Timer, Filter, X, Settings, ChevronDown, Link as LinkIcon, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -287,6 +288,8 @@ const chapters = Array.from(new Set(mockQuestions.map(q => q.chapter)));
 interface StudentPracticeProps {
   showSettings?: boolean;
   onBack?: () => void;
+  siteId?: string;
+  siteTitle?: string;
 }
 
 const QuestionCard = ({ 
@@ -364,17 +367,37 @@ const QuestionCard = ({
   );
 };
 
-export const StudentPractice = ({ showSettings = false, onBack }: StudentPracticeProps) => {
+export const StudentPractice = ({ showSettings = false, onBack, siteId, siteTitle }: StudentPracticeProps) => {
+  const navigate = useNavigate();
   const [activeSet, setActiveSet] = useState('all');
   const [revealedAnswers, setRevealedAnswers] = useState<Set<string>>(new Set());
   const [showAllAnswers, setShowAllAnswers] = useState(false);
   const [sessionTime, setSessionTime] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
+  const [linksHistory, setLinksHistory] = useState<{ id: string; title: string; link: string; lastVisited: string }[]>([]);
   
   // Filter states
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [onlyVerified, setOnlyVerified] = useState(false);
+
+  // Load links history from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem('practiceLinksHistory');
+    if (stored) {
+      setLinksHistory(JSON.parse(stored));
+    } else {
+      // Initialize with default demo links
+      const defaultLinks = [
+        { id: 'phy-mid-2024', title: 'Physics Mid-Term Practice', link: '/practice/phy-mid-2024', lastVisited: '2024-01-20' },
+        { id: 'chem-final-2024', title: 'Chemistry Final Prep', link: '/practice/chem-final-2024', lastVisited: '2024-01-18' },
+        { id: 'math-practice-a', title: 'Mathematics Practice Set', link: '/practice/math-practice-a', lastVisited: '2024-01-15' },
+        { id: 'bio-chapters', title: 'Biology Chapter Tests', link: '/practice/bio-chapters', lastVisited: '2024-01-10' },
+      ];
+      setLinksHistory(defaultLinks);
+      localStorage.setItem('practiceLinksHistory', JSON.stringify(defaultLinks));
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -507,58 +530,41 @@ export const StudentPractice = ({ showSettings = false, onBack }: StudentPractic
                 Practice Links History
               </h3>
               <div className="space-y-2">
-                {[
-                  { 
-                    id: '1', 
-                    title: 'Physics Mid-Term Practice', 
-                    link: 'https://practice.nosurprise.app/phy-mid-2024',
-                    lastVisited: '2024-01-20'
-                  },
-                  { 
-                    id: '2', 
-                    title: 'Chemistry Final Prep', 
-                    link: 'https://practice.nosurprise.app/chem-final-2024',
-                    lastVisited: '2024-01-18'
-                  },
-                  { 
-                    id: '3', 
-                    title: 'Mathematics Practice Set', 
-                    link: 'https://practice.nosurprise.app/math-practice-a',
-                    lastVisited: '2024-01-15'
-                  },
-                  { 
-                    id: '4', 
-                    title: 'Biology Chapter Tests', 
-                    link: 'https://practice.nosurprise.app/bio-chapters',
-                    lastVisited: '2024-01-10'
-                  },
-                ].map((item) => (
-                  <div 
-                    key={item.id} 
-                    className="flex items-center justify-between p-3 bg-muted/50 rounded-xl hover:bg-muted transition-colors group"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{item.title}</p>
-                      <p className="text-xs text-muted-foreground truncate">{item.link}</p>
+                {linksHistory.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No practice links visited yet.</p>
+                ) : (
+                  linksHistory.map((item) => (
+                    <div 
+                      key={item.id} 
+                      className="flex items-center justify-between p-3 bg-muted/50 rounded-xl hover:bg-muted transition-colors group cursor-pointer"
+                      onClick={() => navigate(`/practice/${item.id}`)}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{item.title}</p>
+                        <p className="text-xs text-muted-foreground truncate">{window.location.origin}/practice/{item.id}</p>
+                      </div>
+                      <div className="flex items-center gap-2 ml-3">
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">
+                          {new Date(item.lastVisited).toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}
+                        </span>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/practice/${item.id}`);
+                          }}
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 ml-3">
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">
-                        {new Date(item.lastVisited).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}
-                      </span>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => window.open(item.link, '_blank')}
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
               <p className="text-xs text-muted-foreground mt-3">
                 Quick access to all practice sites you've visited.
@@ -599,8 +605,8 @@ export const StudentPractice = ({ showSettings = false, onBack }: StudentPractic
               <BookOpen className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h2 className="font-semibold text-sidebar-foreground">Physics Practice</h2>
-              <p className="text-xs text-muted-foreground">Class XII</p>
+              <h2 className="font-semibold text-sidebar-foreground">{siteTitle || 'Physics Practice'}</h2>
+              <p className="text-xs text-muted-foreground">{siteId ? 'Practice Site' : 'Class XII'}</p>
             </div>
           </div>
 
