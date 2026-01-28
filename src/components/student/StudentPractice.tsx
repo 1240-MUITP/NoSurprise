@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Clock, Eye, EyeOff, CheckCircle2, AlertCircle, ChevronRight, Timer, Filter, X, Settings, ChevronDown, Link as LinkIcon, ExternalLink } from 'lucide-react';
+import { BookOpen, Clock, Eye, EyeOff, CheckCircle2, AlertCircle, ChevronRight, Timer, Filter, X, Settings, ChevronDown, Link as LinkIcon, ExternalLink, Film } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { RoleToggle } from '@/components/RoleToggle';
+import { VideoRecommendations } from './VideoRecommendations';
 
 interface Question {
   id: string;
@@ -301,6 +302,8 @@ const QuestionCard = ({
   isRevealed: boolean;
   onToggleReveal: () => void;
 }) => {
+  const [showVideos, setShowVideos] = useState(false);
+
   return (
     <div className="card-elevated overflow-hidden animate-fade-in">
       {/* Question Header */}
@@ -323,8 +326,25 @@ const QuestionCard = ({
               }`}>
                 {question.type}
               </span>
+              {/* Video Icon */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowVideos(!showVideos)}
+                className={`h-6 w-6 p-0 ml-auto ${showVideos ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-primary'}`}
+                title="Find related videos"
+              >
+                <Film className="w-4 h-4" />
+              </Button>
             </div>
             <p className="text-foreground leading-relaxed whitespace-pre-line">{question.text}</p>
+            
+            {/* Video Recommendations */}
+            <VideoRecommendations
+              query={question.text.slice(0, 100)}
+              chapter={question.chapter}
+              isOpen={showVideos}
+            />
           </div>
         </div>
       </div>
