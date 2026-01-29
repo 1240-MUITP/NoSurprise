@@ -83,8 +83,10 @@ serve(async (req) => {
     }
 
     const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY');
-    if (!YOUTUBE_API_KEY) {
-      console.error('YOUTUBE_API_KEY is not configured');
+    console.log('API Key present:', !!YOUTUBE_API_KEY, 'Length:', YOUTUBE_API_KEY?.length || 0);
+    
+    if (!YOUTUBE_API_KEY || YOUTUBE_API_KEY.trim() === '') {
+      console.error('YOUTUBE_API_KEY is not configured or empty');
       return new Response(
         JSON.stringify({ error: 'YouTube API key not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
